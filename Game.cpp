@@ -157,7 +157,7 @@ int main()
 			if(event.type == sf::Event::Closed)
 				window.close();
 
-			else if(event.type == sf::Event::KeyPressed)
+			else if(event.type == sf::Event::KeyPressed && !dead)
 			{
 				playing = true;
 				if(event.key.code == sf::Keyboard::Space && !jumping && playing)
@@ -175,21 +175,22 @@ int main()
 		} 
 
 		window.clear();
-		if(playing)
-		{
-			if(player.getPosition().x > lastBlock->getPosition().x + lastBlock->getSize().x + 50)
-			{
-				playing = false;
-				sf::Color c(0, 0, 0, 200);
-				background.setFillColor(c);
-				text.setString("YOU WIN!");
-				text.setCharacterSize(70);
-				text.setPosition((window.getSize().x - text.getGlobalBounds().width)/2, (window.getSize().y - 4*text.getGlobalBounds().height)/2);
-				window.draw(background);
-				window.draw(text);
-				window.display();
-			}
 
+		if(player.getPosition().x > lastBlock->getPosition().x + lastBlock->getSize().x + 50)
+		{
+			playing = false;
+			sf::Color c(0, 0, 0, 200);
+			background.setFillColor(c);
+			text.setString("YOU WIN!");
+			text.setCharacterSize(70);
+			text.setPosition((window.getSize().x - text.getGlobalBounds().width)/2, (window.getSize().y - 4*text.getGlobalBounds().height)/2);
+			window.draw(background);
+			window.draw(text);
+			window.display();
+		}
+
+		if(playing && !dead)
+		{
 			double t = clock.getElapsedTime().asSeconds();
 		
 			double x2 = x, y2 = y;
@@ -231,10 +232,11 @@ int main()
 					pos = (*it)->getPosition();
 					pos.x -= 7;
 					(*it)->setPosition(pos);
-					if(collide(player, **it))
+					if(collide(player, **it) && playing && !dead)
 					{
 						playing = false;
 						jumping = false;
+						dead = true;
 						music.stop();
 						pain.play();
 						sf::Color c(0, 0, 0, 200);
